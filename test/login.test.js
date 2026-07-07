@@ -2,8 +2,8 @@
 const request = require('supertest');
 const {expect} = require ('chai')
 describe('Login',() =>{
-    describe('Post /login',()=>{
-        it('Should return 200 when logging in with valid credentials',async ()=>{
+    describe('Post /auth',()=>{
+        it('Should create a token',async ()=>{
                 const response = await request('//restful-booker.herokuapp.com')
                 .post('/auth')
                 .set('Content-Type','application/json')
@@ -11,7 +11,9 @@ describe('Login',() =>{
                     "username" : "admin",
                     "password" : "password123"
                 })
-                console.log(response.body)
+
+                const token = response.body.token
+                console.log("Token:",token)
                 console.log(response.status)
                 expect(response.status).to.equal(200)
                 expect(response.body.token).to.be.a('string')
