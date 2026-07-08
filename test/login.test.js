@@ -1,10 +1,15 @@
 
+require('dotenv').config()
 const request = require('supertest');
 const {expect} = require ('chai')
+
+
 describe('Login',() =>{
     describe('Post /auth',()=>{
         it('Should create a token',async ()=>{
-                const response = await request('//restful-booker.herokuapp.com')
+            console.log("URL ======> ", process.env.BASE_URL)
+                // const response = await request("https://restful-booker.herokuapp.com")
+                const response = await request(process.env.BASE_URL)
                 .post('/auth')
                 .set('Content-Type','application/json')
                 .send({
