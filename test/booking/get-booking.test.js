@@ -1,5 +1,6 @@
 const request = require('supertest')
 const {expect} = require ('chai')
+require('dotenv').config()
 
 describe('Booking search',()=> {
     describe('GET',()=>{
