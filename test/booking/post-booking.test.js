@@ -2,7 +2,7 @@ require('dotenv').config()
 const request = require('supertest')
 const {expect} = require('chai')
 const booking = require('../../fixtures/booking.json')
-const {getBookingId} = require('../../helpers/addBooking')
+const {getBooking} = require('../../helpers/addBooking')
 
 
 describe('POST', ()=> {
