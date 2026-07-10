@@ -10,9 +10,7 @@ const getBookingId = async () => {
     .set('Accept','application/json')
     .send(booking)
 
-    console.log('====> Booking Id ', response.body.bookingid )
     return response.body.bookingid
-
 }
 module.exports = {
     getBookingId
