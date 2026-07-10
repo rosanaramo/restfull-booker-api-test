@@ -4,8 +4,7 @@ const {expect} = require('chai')
 const booking = require('../../fixtures/booking.json')
 const {getBooking} = require('../../helpers/addBooking')
 
-
-describe('POST', ()=> {
+describe('POST/ booking', ()=> {
     describe('Booking insertion', () => {
         it('Should return 200 when a booking is registered', async () => {
 
