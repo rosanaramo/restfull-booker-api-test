@@ -2,12 +2,13 @@ require('dotenv').config()
 const request = require('supertest')
 const {expect} = require('chai')
 const booking = require('../../fixtures/booking.json')
+const {getBookingId} = require('../../helpers/addBooking')
 
 
 describe('POST', ()=> {
     describe('Booking insertion', () => {
         it('Should return 200 when a booking is registered', async () => {
-            
+
             bookingBody= {...booking}
             bookingBody.firstname = "Pedro Sampaio";
 

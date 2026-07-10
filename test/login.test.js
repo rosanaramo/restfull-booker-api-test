@@ -10,7 +10,6 @@ describe('Login',() =>{
         token = getToken("admin","password123")
     })
         it('Should create a token',async ()=>{
-                
                 console.log("Token:",token)
         })
     })
