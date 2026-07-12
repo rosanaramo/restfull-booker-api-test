@@ -8,16 +8,30 @@ describe('POST/ booking', ()=> {
     describe('Booking insertion', () => {
         it('Should return 200 when a booking is registered', async () => {
 
-            bookingBody= {...booking}
-            bookingBody.firstname = "Pedro Sampaio";
+            const bookingBody= structuredClone(booking)
+            bookingBody.firstname = "Marcio Roberto";
 
-              response = await request(process.env.BASE_URL)
+              const response = await request(process.env.BASE_URL)
               .post('/booking')
               .set('Accept', 'application/json')
               .send(
                     bookingBody
             ).expect(200)
-            console.log(response.body)
+
+            
+           
+        });
+
+        it('Should return 400 when booking checkout date is before the checkin', async () =>{
+            const bookingBody = structuredClone(booking)
+            bookingBody.bookingdates.checkin = "2026-10-09";
+            bookingBody.bookingdates.checkout = "2026-10-08";
+
+            const response = await request (process.env.BASE_URL)
+            .post('/booking')
+            .set('Accept', 'application/json')
+            .expect(400)
+            .send(bookingBody)
         })
     })
 })
