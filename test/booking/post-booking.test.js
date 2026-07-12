@@ -17,8 +17,9 @@ describe('POST/ booking', ()=> {
               .send(
                     bookingBody
             ).expect(200)
-
             
+            expect(response.body).to.have.property('bookingid')
+            expect(response.body.booking).to.deep.equal(bookingBody)
            
         });
 
@@ -32,6 +33,7 @@ describe('POST/ booking', ()=> {
             .set('Accept', 'application/json')
             .expect(400)
             .send(bookingBody)
-        })
+        });
+        
     })
 })
