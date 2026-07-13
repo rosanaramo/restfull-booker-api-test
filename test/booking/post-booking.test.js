@@ -20,6 +20,8 @@ describe('POST/ booking', ()=> {
             
             expect(response.body).to.have.property('bookingid')
             expect(response.body.booking).to.deep.equal(bookingBody)
+            expect(response.headers['content-type']).to.equal('application/json; charset=utf-8');
+            
            
         });
 
@@ -34,6 +36,6 @@ describe('POST/ booking', ()=> {
             .expect(400)
             .send(bookingBody)
         });
-        
+
     })
 })
