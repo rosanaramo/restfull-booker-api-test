@@ -21,11 +21,44 @@ describe('POST/ booking', ()=> {
             expect(response.body).to.have.property('bookingid')
             expect(response.body.booking).to.deep.equal(bookingBody)
             expect(response.headers['content-type']).to.equal('application/json; charset=utf-8');
-            
-           
         });
 
-        it('Should return 400 when booking checkout date is before the checkin', async () =>{
+        //bug --> returns server error instead of 400
+        it('Should return 400 when the firstname is a null value', async ()=>{
+            const bookingBody = structuredClone(booking)
+            bookingBody.firstname = null
+
+            const response = await request(process.env.BASE_URL)
+            .post('/booking')
+            .set('Accept', 'application/json')
+            .send(bookingBody)
+            .expect(400)
+        })
+
+        it('Should allow register a booking with total price equals 0',async ()=> {
+            const bookingBody = structuredClone(booking)
+            bookingBody.totalprice= 0
+
+            const response = await request(process.env.BASE_URL)
+            .post('/booking')
+            .set('Accept', 'application/json')
+            .send(bookingBody)
+            .expect(200)
+        })
+
+        it('simple test', async ()=>{
+            const bookingBody = structuredClone(booking)
+            // bookingBody.firstname = "Lilian"
+
+            const response = await request(process.env.BASE_URL)
+            .post('/booking')
+            .set('Accept', 'application/json')
+            .send(bookingBody)
+            .expect(200)
+        })
+
+        it('Should return 400 when checkout is before the checkin', async () =>{
+            // bug --> should not allow to register a booking with checkout before the checkin
             const bookingBody = structuredClone(booking)
             bookingBody.bookingdates.checkin = "2026-10-09";
             bookingBody.bookingdates.checkout = "2026-10-08";
@@ -36,6 +69,5 @@ describe('POST/ booking', ()=> {
             .expect(400)
             .send(bookingBody)
         });
-
     })
 })
