@@ -4,7 +4,6 @@ const {expect} = require('chai')
 const booking = require('../../fixtures/booking.json')
 const {getBooking} = require('../../helpers/addBooking')
 
-
 /* TODO:
 --> create a method to dinamic dates
 --> create a helper to create text with especial characters
@@ -149,15 +148,17 @@ describe('POST/ booking', ()=> {
         });
     })
 
-        it('simple test', async ()=>{
+    describe('Security tests',()=>{
+        it('Should reject HTML scprit',async ()=>{
+            // bug --> it accepts html scripts
             const bookingBody = structuredClone(booking)
-            // bookingBody.firstname = "Lilian"
+            bookingBody.firstname = "<script>alert(1)</script>"
 
             const response = await request(process.env.BASE_URL)
             .post('/booking')
             .set('Accept', 'application/json')
             .send(bookingBody)
-            .expect(200)
-        })
-   
+            .expect(400)
+        });
+    })
 })
