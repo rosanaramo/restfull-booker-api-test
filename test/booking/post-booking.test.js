@@ -5,18 +5,13 @@ const booking = require('../../fixtures/booking.json')
 const {getBooking} = require('../../helpers/addBooking')
 const {createBooking} = require('../factories/bookingFactory')
 
-/* TODO:
---> create a method to dinamic dates
---> create a helper to create text with especial characters
---> use a faker or something
-*/
 describe('POST/ booking', ()=> {
 
     describe('Happy path', () => {
         it('Should return 200 when a booking is registered', async () => {
 
             const bookingBody= createBooking({
-                firstName: 'Marcio Roberto'
+                firstname: 'Marcio Roberto'
             })
 
               const response = await request(process.env.BASE_URL)
