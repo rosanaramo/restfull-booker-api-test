@@ -1,0 +1,14 @@
+const booking = require('../fixtures/booking.json')
+
+function createBooking (overrides ={}){
+    const bookingBody = structuredClone(booking);
+
+    return{
+        ...booking,
+        ...overrides
+    };
+}
+
+module.exports ={
+    createBooking
+}
