@@ -3,6 +3,7 @@ const request = require('supertest')
 const {expect} = require('chai')
 const booking = require('../../fixtures/booking.json')
 const {getBooking} = require('../../helpers/addBooking')
+const {createBooking} = require('../factories/bookingFactory')
 
 /* TODO:
 --> create a method to dinamic dates
@@ -14,8 +15,9 @@ describe('POST/ booking', ()=> {
     describe('Happy path', () => {
         it('Should return 200 when a booking is registered', async () => {
 
-            const bookingBody= structuredClone(booking)
-            bookingBody.firstname = "Marcio Roberto";
+            const bookingBody= createBooking({
+                firstName: 'Marcio Roberto'
+            })
 
               const response = await request(process.env.BASE_URL)
               .post('/booking')
