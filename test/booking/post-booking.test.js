@@ -133,7 +133,7 @@ describe('POST/ booking', ()=> {
             // add helper to create special characters here
 
             const bookingBody = createBooking();
-            bookingBody.additionalneeds = "insert here helper"
+            bookingBody.additionalneeds = "!@#$%^&*()"
 
             const response = await request(process.env.BASE_URL)
             .post('/booking')
