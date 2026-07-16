@@ -3,16 +3,14 @@ const request = require('supertest')
 const {expect} = require('chai')
 const booking = require('../../fixtures/booking.json')
 const {getBooking} = require('../../helpers/addBooking')
-const {createBooking} = require('../factories/bookingFactory')
+const {createBooking} = require('../../factories/bookingFactory')
 
 describe('POST/ booking', ()=> {
 
     describe('Happy path', () => {
         it('Should return 200 when a booking is registered', async () => {
 
-            const bookingBody= createBooking({
-                firstname: 'Marcio Roberto'
-            })
+            const bookingBody= createBooking();
 
               const response = await request(process.env.BASE_URL)
               .post('/booking')
@@ -30,8 +28,8 @@ describe('POST/ booking', ()=> {
     describe('Invalid data types',() => {
           //bug --> returns server error instead of 400
         it('Should return 400 when the firstname is a null value', async ()=>{
-            const bookingBody = structuredClone(booking)
-            bookingBody.firstname = null
+            const bookingBody = createBooking();
+            bookingBody.firstname = null;
 
             const response = await request(process.env.BASE_URL)
             .post('/booking')
@@ -42,7 +40,7 @@ describe('POST/ booking', ()=> {
 
         it('Should return 400 when the checkin is not a valid date format', async ()=>{
             // bug --> returns 200 to invalid date format
-            const bookingBody = structuredClone(booking)
+            const bookingBody = createBooking();
             bookingBody.bookingdates.checkin = "33/098/99"
 
             const response = await request
@@ -55,7 +53,7 @@ describe('POST/ booking', ()=> {
 
         it('Should return 400 when the checkout is not a valid date format',  async () =>{
             // bug --> returns 200 instead of 400
-            const bookingBody = structuredClone(booking)
+            const bookingBody = createBooking();
             bookingBody.checkout = "3456/00/00"
 
             const response = await request(process.env.BASE_URL)
@@ -68,7 +66,7 @@ describe('POST/ booking', ()=> {
 
         it('Should return 400 when depositpaid is not a boolean value ', async () => {
             // bug --> api accepts boolean value as string
-            const bookingBody = structuredClone(booking)
+            const bookingBody = createBooking();
             bookingBody.depositpaid = "true"
 
             const response = await request(process.env.BASE_URL)
@@ -82,7 +80,7 @@ describe('POST/ booking', ()=> {
     describe('Business rules', ()=> {
 
          it('Should allow register a booking with total price equals 0',async ()=> {
-            const bookingBody = structuredClone(booking)
+            const bookingBody = createBooking();
             bookingBody.totalprice= 0
 
             const response = await request(process.env.BASE_URL)
@@ -94,7 +92,7 @@ describe('POST/ booking', ()=> {
 
         it('Should return 400 when checkout is before the checkin', async () =>{
             // bug --> should not allow to register a booking with checkout before the checkin
-            const bookingBody = structuredClone(booking)
+            const bookingBody = createBooking();
             bookingBody.bookingdates.checkin = "2026-10-09";
             bookingBody.bookingdates.checkout = "2026-10-08";
 
@@ -109,7 +107,7 @@ describe('POST/ booking', ()=> {
     describe('Special characters', ()=> {
 
         it('Should allow special characters in field firstname',async ()=> {
-            const bookingBody = structuredClone(booking)
+            const bookingBody = createBooking();
             bookingBody.firstname = "José Catalãn Vaçe"
 
             const response = await request(process.env.BASE_URL)
@@ -121,7 +119,7 @@ describe('POST/ booking', ()=> {
 
         it('Should allow special characters in field lastname', async ()=> {
 
-            const bookingBody = structuredClone(booking)
+            const bookingBody = createBooking();
             bookingBody.lastName = "José Catalãn Vaçe";
 
             const response = await request(process.env.BASE_URL)
@@ -134,7 +132,7 @@ describe('POST/ booking', ()=> {
         it('Should accept special characters in the field additionalneeds', async()=>{
             // add helper to create special characters here
 
-            const bookingBody = structuredClone(booking)
+            const bookingBody = createBooking();
             bookingBody.additionalneeds = "insert here helper"
 
             const response = await request(process.env.BASE_URL)
@@ -148,7 +146,7 @@ describe('POST/ booking', ()=> {
     describe('Security tests',()=>{
         it('Should reject HTML scprit',async ()=>{
             // bug --> it accepts html scripts
-            const bookingBody = structuredClone(booking)
+            const bookingBody =  createBooking();
             bookingBody.firstname = "<script>alert(1)</script>"
 
             const response = await request(process.env.BASE_URL)
