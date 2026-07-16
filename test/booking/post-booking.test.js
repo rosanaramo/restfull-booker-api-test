@@ -16,7 +16,7 @@ describe('POST/ booking', ()=> {
         it('Should return 200 when a booking is registered', async () => {
 
             const bookingBody= createBooking({
-                firstName: 'Marcio Roberto'
+                firstname: 'Marcio Roberto'
             })
 
               const response = await request(process.env.BASE_URL)
