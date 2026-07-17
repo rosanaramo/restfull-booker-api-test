@@ -34,7 +34,7 @@ describe('GET/booking',()=> {
     describe('Headers Validation', ()=>{
 
         it('Should return header application/json; charset=utf-8',async()=>{
-
+            
             const {bookingId} = await booking();
             const response = await request(process.env.BASE_URL)
             .get(`/booking/${bookingId}`)
@@ -44,15 +44,15 @@ describe('GET/booking',()=> {
             expect(response.headers['content-type']).to.equal('application/json; charset=utf-8')
         });
 
-        it('Should return 418 for invalid Accept content',async ()=>{
+        it('Should return 418 for invalid Accept header',async ()=>{
+            
             const {bookingId} = await booking();
-
             const response = await request(process.env.BASE_URL)
             .get(`/booking/${bookingId}`)
             .set('Accept', 'application/html')
             
-            expect(response.status).to.be.equal(418,"I'm a Teapot")
-
+            expect(response.status, 'Status code should be 418').to.be.equal(418);
+            expect(response.text).to.be.equal("I'm a Teapot");
         });
     });
 
