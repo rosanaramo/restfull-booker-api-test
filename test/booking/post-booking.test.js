@@ -5,10 +5,16 @@ const {createBooking} = require('../../factories/bookingFactory')
 
 describe('POST/booking', ()=> {
 
+    let bookingBody;
+    beforeEach(()=>{
+
+        bookingBody= createBooking();
+    });
+
     describe('Happy Path', () => {
         it('Should return 200 when a booking is registered', async () => {
 
-            const bookingBody= createBooking();
+            // const bookingBody= createBooking();
 
               const response = await request(process.env.BASE_URL)
               .post('/booking')
@@ -25,7 +31,7 @@ describe('POST/booking', ()=> {
     describe('Headers Validation', ()=>{
 
         it('Should not accept  application/html', async ()=>{
-            const bookingBody = createBooking();
+
             const response = await request(process.env.BASE_URL)
             .post('/booking')
             .set('Accept', 'application/html')
@@ -36,7 +42,7 @@ describe('POST/booking', ()=> {
         })
 
         it('Should return header content-type application/json; charset=utf-8',async()=>{
-            const bookingBody = createBooking();
+
             const response = await request(process.env.BASE_URL)
             .post('/booking')
             .set('Accept', 'application/json')
@@ -49,7 +55,6 @@ describe('POST/booking', ()=> {
     describe('Invalid Data Types',() => {
           //BUG: API returns 500 server error instead of 400
         it('Should return 400 when the firstname is a null value', async ()=>{
-            const bookingBody = createBooking();
             bookingBody.firstname = null;
 
             const response = await request(process.env.BASE_URL)
@@ -61,7 +66,6 @@ describe('POST/booking', ()=> {
 
         it('Should return 400 when the checkin is not a valid date format', async ()=>{
             // bug --> returns 200 to invalid date format
-            const bookingBody = createBooking();
             bookingBody.bookingdates.checkin = "33/098/99"
 
             const response = await request
@@ -74,7 +78,6 @@ describe('POST/booking', ()=> {
 
         it('Should return 400 when the checkout is not a valid date format',  async () =>{
             // bug --> returns 200 instead of 400
-            const bookingBody = createBooking();
             bookingBody.bookingdates.checkout = "3456/00/00"
 
             const response = await request(process.env.BASE_URL)
@@ -87,7 +90,6 @@ describe('POST/booking', ()=> {
 
         it('Should return 400 when depositpaid is not a boolean value ', async () => {
             // BUG: API accepts boolean value as string
-            const bookingBody = createBooking();
             bookingBody.depositpaid = "true"
 
             const response = await request(process.env.BASE_URL)
@@ -101,7 +103,6 @@ describe('POST/booking', ()=> {
     describe('Business Rules', ()=> {
 
          it('Should allow registering a booking with total price equals 0',async ()=> {
-            const bookingBody = createBooking();
             bookingBody.totalprice= 0
 
             const response = await request(process.env.BASE_URL)
@@ -113,7 +114,6 @@ describe('POST/booking', ()=> {
 
         it('Should return 400 when checkout is before the checkin', async () =>{
             // BUG: API allows registering a booking with checkout before the checkin
-            const bookingBody = createBooking();
             bookingBody.bookingdates.checkin = "2026-10-09";
             bookingBody.bookingdates.checkout = "2026-10-08";
 
@@ -128,7 +128,6 @@ describe('POST/booking', ()=> {
     describe('Special Characters', ()=> {
 
         it('Should allow special characters in field firstname',async ()=> {
-            const bookingBody = createBooking();
             bookingBody.firstname = "José Catalãn Vaçe"
 
             const response = await request(process.env.BASE_URL)
@@ -142,7 +141,6 @@ describe('POST/booking', ()=> {
 
         it('Should allow special characters in field lastname', async ()=> {
 
-            const bookingBody = createBooking();
             bookingBody.lastname = "José Catalãn Vaçe";
 
             const response = await request(process.env.BASE_URL)
@@ -157,7 +155,6 @@ describe('POST/booking', ()=> {
         it('Should accept special characters in the field additionalneeds', async()=>{
             // add helper to create special characters here
 
-            const bookingBody = createBooking();
             bookingBody.additionalneeds = "!@#$%^&*()"
 
             const response = await request(process.env.BASE_URL)
@@ -173,7 +170,6 @@ describe('POST/booking', ()=> {
     describe('Security Tests',()=>{
         it('Should reject HTML script',async ()=>{
             //BUG: API accepts html scripts and returns 200 instead of return 400
-            const bookingBody =  createBooking();
             bookingBody.firstname = "<script>alert(1)</script>"
 
             const response = await request(process.env.BASE_URL)
@@ -185,7 +181,6 @@ describe('POST/booking', ()=> {
 
         it('Should reject sql injection', async ()=>{
             // BUG: API accepts sql injection and returns 200 instead reject and return 400
-            const bookingBody = createBooking();
             bookingBody.firstname = "'; DROP TABLE booking; --";
             const response = await request(process.env.BASE_URL)
             .post('/booking')

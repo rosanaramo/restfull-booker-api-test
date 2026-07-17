@@ -5,22 +5,28 @@ const {booking} = require('../../helpers/addBooking.js')
 require('dotenv').config()
 
 describe('GET/booking',()=> {
+
+    let bookingId;
+    let bookingBody;
+
+    beforeEach(async()=>{
+        ({bookingId, bookingBody} = await booking());
+    })
     
     describe('Happy Path',()=>{
         it('Should return a list of bookings', async ()=>{
-            const {bookingId, bookingBody} = booking()
-             response = await request(process.env.BASE_URL)
+            const response = await request(process.env.BASE_URL)
                 .get("/booking")
                 .expect(200)
                 .expect('Content-Type',/json/) 
                 
                 //chai assertions
-                expect(response.body).to.not.be.empty;
                 expect(response.body).to.be.an('array')
+                expect(response.body).to.not.be.empty;
+                
         });
 
-        it('Should return a book by ID', async ()=>{
-            const {bookingBody, bookingId}  = await booking();
+        it('Should return a booking by ID', async ()=>{
 
             const response = await request(process.env.BASE_URL)
             .get(`/booking/${bookingId}`)
@@ -34,8 +40,6 @@ describe('GET/booking',()=> {
     describe('Headers Validation', ()=>{
 
         it('Should return header application/json; charset=utf-8',async()=>{
-            
-            const {bookingId} = await booking();
             const response = await request(process.env.BASE_URL)
             .get(`/booking/${bookingId}`)
             .set('Accept', 'application/json')
@@ -45,8 +49,7 @@ describe('GET/booking',()=> {
         });
 
         it('Should return 418 for invalid Accept header',async ()=>{
-            
-            const {bookingId} = await booking();
+        
             const response = await request(process.env.BASE_URL)
             .get(`/booking/${bookingId}`)
             .set('Accept', 'application/html')
@@ -59,7 +62,6 @@ describe('GET/booking',()=> {
     describe('Response Structure', ()=>{
 
         it('Should contain expected properties',async ()=>{
-            const {bookingId}= await booking();
 
             const response = await request(process.env.BASE_URL)
             .get(`/booking/${bookingId}`)
@@ -69,21 +71,17 @@ describe('GET/booking',()=> {
             expect(response.body).to.have.property('firstname');
             expect(response.body).to.have.property('lastname');
             expect(response.body).to.have.property('depositpaid');
+            expect(response.body).to.have.property('bookingdates');
             expect(response.body.bookingdates).to.have.property('checkin');
             expect(response.body.bookingdates).to.have.property('checkout');
             expect(response.body).to.have.property('additionalneeds');
+            expect(response.body).to.have.property('totalprice');
         });
     });
 
-    describe('Query Parameters', () => {
-
-    });
-
-    describe('Data Validation', ()=>{
+    describe('Response Data Validation', ()=>{
 
         it('Should validate data types', async()=>{
-
-            const {bookingBody, bookingId}  = await booking();
 
             const response = await request(process.env.BASE_URL)
             .get(`/booking/${bookingId}`)
@@ -103,16 +101,36 @@ describe('GET/booking',()=> {
         });
     });
 
-    describe('Invalid Parameters', ()=>{
+    describe('Invalid Path Parameters', ()=>{
 
+        it('Should return 404 for nonexisting booking', async()=>{
+        
+            const response = await request(process.env.BASE_URL)
+            .get('/booking/9999')
+            .set('Accept', 'application/json')
+            .expect(404)   
+            
+            expect(response.text).to.be.equal('Not Found');
+        });
+
+        it("Should return 404 for special characters in booking ID", async()=>{
+
+            const response = await request(process.env.BASE_URL)
+            .get('/booking/@@@')
+            .set('Accept', 'application/json')
+            .expect(404)   
+            
+            expect(response.text).to.be.equal('Not Found');
+        });
+
+         it("Should return 404 for booking ID 0 ", async()=>{
+
+            const response = await request(process.env.BASE_URL)
+            .get('/booking/0')
+            .set('Accept', 'application/json')
+            .expect(404)   
+            
+            expect(response.text).to.be.equal('Not Found');
+        });
     });
-
-    describe('Business Rules', ()=>{
-
-    });
-
-    describe('Security Tests', () =>{
-
-    });
-
 })
