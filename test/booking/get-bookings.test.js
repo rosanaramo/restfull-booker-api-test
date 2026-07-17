@@ -1,11 +1,13 @@
 const request = require('supertest')
 const {expect} = require ('chai')
-const {createBooking} = require('../../helpers/addBooking.js')
+const {booking} = require('../../helpers/addBooking.js')
+
 require('dotenv').config()
 
 describe('Booking search',()=> {
     describe('GET/ booking',()=>{
         it('Should return a list of bookings', async ()=>{
+            const {bookingId, bookingBody} = booking()
              response = await request(process.env.BASE_URL)
                 .get("/booking")
                 .expect(200)
@@ -17,15 +19,14 @@ describe('Booking search',()=> {
         });
 
         it('Should return a book by ID', async ()=>{
-            const {bookingId, bookingBody} = await createBooking();
-            console.log(bookingId)
+            const bookingBody = await createBooking();
 
             const response = await request(process.env.BASE_URL)
-            .get(`/booking/${bookingId}`).
-            set('Accept', 'application/json')
+            .get(`/booking/${bookingBody.bookingId}`)
+            .set('Accept', 'application/json')
             .expect(200)     
             
-            expect(response.body).to.deep.equal(bookingBody)
+            expect(response.body.booking).to.deep.equal(bookingBody)
         })
     })
 })
