@@ -18,7 +18,6 @@ describe('GET/booking',()=> {
                 expect(response.body).to.not.be.empty;
                 expect(response.body).to.be.an('array')
         });
-        
 
         it('Should return a book by ID', async ()=>{
             const {bookingBody, bookingId}  = await booking();
@@ -29,17 +28,32 @@ describe('GET/booking',()=> {
             .expect(200)     
             
             expect(response.body).to.deep.equal(bookingBody)
-            expect(response.body.firstname).to.equal(bookingBody.firstname)
-            expect(response.body.lastname).to.equal(bookingBody.lastname)
-            expect(response.body.depositpaid).to.equal(bookingBody.depositpaid)
-            expect(response.body.bookingdates.checkin).to.equal(bookingBody.bookingdates.checkin)
-            expect(response.body.bookingdates.checkout).to.equal(bookingBody.bookingdates.checkout)
-        })
+        });
     });
-
 
     describe('Headers Validation', ()=>{
 
+        it('Should return header application/json; charset=utf-8',async()=>{
+
+            const {bookingId} = await booking();
+            const response = await request(process.env.BASE_URL)
+            .get(`/booking/${bookingId}`)
+            .set('Accept', 'application/json')
+            .expect(200)
+            
+            expect(response.headers['content-type']).to.equal('application/json; charset=utf-8')
+        });
+
+        it('Should return 418 for invalid Accept content',async ()=>{
+            const {bookingId} = await booking();
+
+            const response = await request(process.env.BASE_URL)
+            .get(`/booking/${bookingId}`)
+            .set('Accept', 'application/html')
+            
+            expect(response.status).to.be.equal(418,"I'm a Teapot")
+
+        });
     });
 
     describe('Response Structure', ()=>{
@@ -86,7 +100,6 @@ describe('GET/booking',()=> {
             expect(response.body.bookingdates.checkout).to.match(/^\d{4}-\d{2}-\d{2}$/);
             expect(response.body.additionalneeds).to.be.a('string');
             expect(response.body.totalprice).to.be.a('number');
-
         });
     });
 
