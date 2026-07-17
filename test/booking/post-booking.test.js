@@ -18,8 +18,7 @@ describe('POST/booking', ()=> {
             ).expect(200)
             
             expect(response.body).to.have.property('bookingid')
-            expect(response.body.booking).to.deep.equal(bookingBody)
-            
+            expect(response.body.booking).to.deep.equal(bookingBody) 
         });
     })
 
@@ -33,7 +32,6 @@ describe('POST/booking', ()=> {
             .send(bookingBody)
             
             expect(response.status).to.equal(418, "I'm a Teapot");
-
         })
 
         it('Should return header content-type application/json; charset=utf-8',async()=>{
@@ -44,7 +42,6 @@ describe('POST/booking', ()=> {
             .send(bookingBody)
             
             expect(response.headers['content-type']).to.equal('application/json; charset=utf-8')
-
         })
     })
 
@@ -194,9 +191,7 @@ describe('POST/booking', ()=> {
             .set('Accept', 'application/json')
             .send(bookingBody)
             
-
             expect(response.status).to.equal(400)
-            
         })
     })
 })
