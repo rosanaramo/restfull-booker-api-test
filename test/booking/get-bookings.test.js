@@ -5,6 +5,7 @@ const {booking} = require('../../helpers/addBooking.js')
 require('dotenv').config()
 
 describe('GET/booking',()=> {
+    
     describe('Happy Path',()=>{
         it('Should return a list of bookings', async ()=>{
             const {bookingId, bookingBody} = booking()
@@ -60,15 +61,33 @@ describe('GET/booking',()=> {
         });
     });
 
-
     describe('Query Parameters', () => {
 
     });
 
- 
-
     describe('Data Validation', ()=>{
 
+        it('Should validate data types', async()=>{
+
+            const {bookingBody, bookingId}  = await booking();
+
+            const response = await request(process.env.BASE_URL)
+            .get(`/booking/${bookingId}`)
+            .set('Accept', 'application/json')
+            .expect(200)     
+            
+            expect(response.body.firstname).to.be.a('string');
+            expect(response.body.lastname).to.be.a('string');
+            expect(response.body.depositpaid).to.be.a('boolean');
+            expect(response.body.bookingdates).to.be.a('object');
+            expect(response.body.bookingdates.checkin).to.be.a('string');
+            expect(response.body.bookingdates.checkin).to.match(/^\d{4}-\d{2}-\d{2}$/);
+            expect(response.body.bookingdates.checkout).to.be.a('string');
+            expect(response.body.bookingdates.checkout).to.match(/^\d{4}-\d{2}-\d{2}$/);
+            expect(response.body.additionalneeds).to.be.a('string');
+            expect(response.body.totalprice).to.be.a('number');
+
+        });
     });
 
     describe('Invalid Parameters', ()=>{
