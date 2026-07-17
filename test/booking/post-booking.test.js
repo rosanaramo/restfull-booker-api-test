@@ -31,7 +31,8 @@ describe('POST/booking', ()=> {
             .set('Accept', 'application/html')
             .send(bookingBody)
             
-            expect(response.status).to.equal(418, "I'm a Teapot");
+            expect(response.status).to.equal(418);
+            expect(response.text).to.be.equal("I'm a Teapot");
         })
 
         it('Should return header content-type application/json; charset=utf-8',async()=>{
