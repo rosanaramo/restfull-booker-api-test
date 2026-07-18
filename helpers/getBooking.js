@@ -8,4 +8,10 @@ const getBooking = async(bookingInd) =>{
     .get(`/booking/${bookingInd}`)
     .set('Accept', 'application/json')
     .expect(200)
+    
+    return response;
+}
+
+module.exports = {
+    getBooking
 }
