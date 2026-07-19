@@ -154,10 +154,21 @@ describe('PUT/booking',()=>{
 
     describe('Idempotency', ()=>{
 
-        it('Should keep data consistency after same request multiple times',()=>{
+           it('Should be idempotent when updating a booking', async ()=>{
+            let requestResponse;
+                for(let i =0; i<2; i++ ){
+                    
+                    requestResponse = await request(process.env.BASE_URL)
+                    .put(`/booking/${bookingId}`)
+                    .set('Accept', 'application/json')
+                    .set('Cookie', `token=${token}`)
+                    .send(updatedBooking)
+                    .expect(200)
+                }
 
-        })
-
+            const {response} = await getBooking(bookingId);                
+            expect(response).to.be.deep.equal(updatedBooking)
+        });
     });
 
 });
