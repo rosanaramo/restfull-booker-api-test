@@ -7,7 +7,8 @@ const getBooking = async(bookingId) =>{
     const response = await request(process.env.BASE_URL)
     .get(`/booking/${bookingId}`)
     .set('Accept', 'application/json')
-    console.log(response)
+
+    return response;
 }
 
 module.exports = {
