@@ -4,6 +4,8 @@ const {expect} = require('chai')
 const {faker} = require('@faker-js/faker')
 const {booking} = require('../../helpers/addBooking.js')
 const {getToken} = require('../../helpers/authentication.js')
+const {getBooking} = require('../../helpers/getBooking.js');
+const {createBooking} = require('../../factories/bookingFactory.js')
 
 
 
@@ -20,20 +22,57 @@ describe('PUT/booking',()=>{
 
     describe('Happy Path',()=>{
            
-        it('Should update a booking', async ()=>{
-            
+        it('Should update all fields of a booking', async ()=>{
+            const updatedBooking = createBooking();
             
             const response = await request(process.env.BASE_URL)
             .put(`/booking/${bookingId}`)
             .set('Accept', 'application/json')
             .set('Cookie', `token=${token}`)
-            .send(bookingBody)
+            .send(updatedBooking)
             .expect(200)
+
+           expect(response.body).to.be.deep.equal(updatedBooking)
         });
 
+         it('Should update booking with empty fields', async ()=>{
+            const updatedBooking = {
+                firstname : "",
+                lastname : "",
+                totalprice : 0,
+                depositpaid : false,
+                    bookingdates : 
+                    {
+                        checkin : "",
+                        checkout : ""
+                    },
+                 additionalneeds : ""
+            };
+            
+            const response = await request(process.env.BASE_URL)
+            .put(`/booking/${bookingId}`)
+            .set('Accept', 'application/json')
+            .set('Cookie', `token=${token}`)
+            .send(updatedBooking)
+            .expect(200)
+
+           expect(response.body).to.be.deep.equal(updatedBooking)
+        });
     });
 
     describe('Headers Validation', ()=> {
+        const updatedBooking = createBooking();
+
+        it('Should return header application/json; charset=utf-8', async ()=>{
+            const response = await request(process.env.BASE_URL)
+            .put(`/booking/${bookingId}`)
+            .set('Accept', 'application/json')
+            .set('Cookie', `token=${token}`)
+            .send(updatedBooking)
+            .expect(200)
+
+            expect(response.headers['content-type']).to.be.equal('application/json; charset=utf-8');
+        });
 
     });
     
@@ -44,11 +83,6 @@ describe('PUT/booking',()=>{
     describe('Invalid Data Types', () =>{
 
     });
-
-    describe('Business Rules', () =>{
-
-    });
-
     describe('Special Characters', ()=>{
 
     });

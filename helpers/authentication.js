@@ -3,8 +3,7 @@ require('dotenv').config()
 const request = require('supertest');
 const credentials = require('../fixtures/credentials.json')
 
-const getToken = async () =>{
-
+const getToken = async (usuario, senha) =>{
     const bodyCredentials= {...credentials}
     const response = await request(process.env.BASE_URL)
                     .post('/auth')
@@ -14,6 +13,7 @@ const getToken = async () =>{
                     )
         
     return response.body.token
+   
 }
  module.exports = {
         getToken
