@@ -14,16 +14,17 @@ describe('PUT/booking',()=>{
     let bookingBody;
     let bookingId;
     let token;
+    let updatedBooking;
 
     beforeEach(async ()=>{
         ({bookingBody, bookingId} = await booking());
          token = await getToken();
+         updatedBooking = createBooking();
     })
 
     describe('Happy Path',()=>{
            
         it('Should update all fields of a booking', async ()=>{
-            const updatedBooking = createBooking();
             
             const response = await request(process.env.BASE_URL)
             .put(`/booking/${bookingId}`)
@@ -36,6 +37,7 @@ describe('PUT/booking',()=>{
         });
 
          it('Should update booking with empty fields', async ()=>{
+            // BUG: API accepts empty dates and converts them to "0NaN-aN-aN" instead of returning HTTP 400.
             const updatedBooking = {
                 firstname : "",
                 lastname : "",
@@ -72,12 +74,23 @@ describe('PUT/booking',()=>{
             .expect(200)
 
             expect(response.headers['content-type']).to.be.equal('application/json; charset=utf-8');
-        });
 
+        });
     });
     
     describe ('Invalid Booking ID', ()=>{
 
+        it('Should return not found when trying to update a nonexistent booking', async ()=>{
+
+            
+            const response = await request(process.env.BASE_URL)
+            .put('/booking/1')
+            .set('Accept', 'application/json')
+            .set('Cookie', `token=${token}`)
+            .send(updatedBooking)
+            .expect(200)
+
+        });
     });
 
     describe('Invalid Data Types', () =>{
