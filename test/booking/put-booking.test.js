@@ -58,11 +58,21 @@ describe('PUT/booking',()=>{
 
            expect(response.body).to.be.deep.equal(updatedBooking)
         });
-        
-
     });
 
     describe('Headers Validation', ()=> {
+        const updatedBooking = createBooking();
+
+        it('Should return header application/json; charset=utf-8', async ()=>{
+            const response = await request(process.env.BASE_URL)
+            .put(`/booking/${bookingId}`)
+            .set('Accept', 'application/json')
+            .set('Cookie', `token=${token}`)
+            .send(updatedBooking)
+            .expect(200)
+
+            expect(response.headers['content-type']).to.be.equal('application/json; charset=utf-8');
+        });
 
     });
     
@@ -73,11 +83,6 @@ describe('PUT/booking',()=>{
     describe('Invalid Data Types', () =>{
 
     });
-
-    describe('Business Rules', () =>{
-
-    });
-
     describe('Special Characters', ()=>{
 
     });
