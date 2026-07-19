@@ -96,10 +96,15 @@ describe('PUT/booking',()=>{
 
     describe('Invalid Data Types', () =>{
 
-    });
-    describe('Special Characters', async()=>{
 
-        it('Should allow to update bookings with special characters in string fields',async()=>{
+
+
+
+
+    });
+    describe('Special Characters', ()=>{
+
+         it('Should allow to update bookings with special characters in string fields',async()=>{
             
              const updatedBooking = {
                 firstname : "teste",
@@ -130,6 +135,29 @@ describe('PUT/booking',()=>{
     });
 
     describe('Security Tests', ()=> {
+
+
+        it('Should reject HTML script',async ()=>{
+                    //BUG: API accepts html scripts and returns 200 instead of return 400
+                    bookingBody.firstname = "<script>alert(1)</script>"
+        
+                    const response = await request(process.env.BASE_URL)
+                    .post('/booking')
+                    .set('Accept', 'application/json')
+                    .send(bookingBody)
+                    .expect(400)
+                });
+        
+                it('Should reject sql injection', async ()=>{
+                    // BUG: API accepts sql injection and returns 200 instead reject and return 400
+                    bookingBody.firstname = "'; DROP TABLE booking; --";
+                    const response = await request(process.env.BASE_URL)
+                    .post('/booking')
+                    .set('Accept', 'application/json')
+                    .send(bookingBody)
+                    
+                    expect(response.status).to.equal(400)
+                })
 
     })
 
