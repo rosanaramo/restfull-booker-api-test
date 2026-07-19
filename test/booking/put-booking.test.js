@@ -63,7 +63,6 @@ describe('PUT/booking',()=>{
     });
 
     describe('Headers Validation', ()=> {
-        const updatedBooking = createBooking();
 
         it('Should return header application/json; charset=utf-8', async ()=>{
             const response = await request(process.env.BASE_URL)
@@ -80,28 +79,77 @@ describe('PUT/booking',()=>{
     
     describe ('Invalid Booking ID', ()=>{
 
-        it('Should return not found when trying to update a nonexistent booking', async ()=>{
+        it('Should return 405 when trying to update a nonexistent booking', async ()=>{
 
-            
             const response = await request(process.env.BASE_URL)
-            .put('/booking/1')
+            .put('/booking/897089098088')
             .set('Accept', 'application/json')
+            .set('Cookie', `token=${token}`)
+            .send(updatedBooking)
+            .expect(405)
+
+            console.log(response.text)
+            expect(response.text).to.be.equal('Method Not Allowed')
+            
+        });
+    });
+
+    describe('Special Characters', ()=>{
+
+         it('Should allow to update bookings with special characters in string fields',async()=>{
+            
+             const updatedBooking = {
+                firstname : "teste",
+                lastname : "_&&&&مرح˜˜˜با",
+                totalprice : 0,
+                depositpaid : false,
+                    bookingdates : 
+                    {
+                        checkin : "%%",
+                        checkout : "%%"
+                    },
+                 additionalneeds : "くるま"
+            };
+
+            const response = await request(process.env.BASE_URL)
+            .put(`/booking/${bookingId}`)
+            .set('Accept','application/json')
             .set('Cookie', `token=${token}`)
             .send(updatedBooking)
             .expect(200)
 
+            console.log(response.body)
+            console.log(updatedBooking)
+            expect(response.body).to.be.deep.equal(updatedBooking)
+
         });
-    });
-
-    describe('Invalid Data Types', () =>{
-
-    });
-    describe('Special Characters', ()=>{
 
     });
 
     describe('Security Tests', ()=> {
-
+        it('Should reject HTML script',async ()=>{
+                    //BUG: API accepts html scripts and returns 200 instead of return 400
+                    updatedBooking.firstname = "<script>alert(1)</script>"
+        
+                    const response = await request(process.env.BASE_URL)
+                    .put(`/booking/${bookingId}`)
+                    .set('Cookie',`token=${token}`)
+                    .set('Accept', 'application/json')
+                    .send(updatedBooking)
+                    .expect(400)
+                });
+        
+                it('Should reject sql injection', async ()=>{
+                    // BUG: API accepts sql injection and returns 200 instead reject and return 400
+                    updatedBooking.firstname = "'; DROP TABLE booking; --";
+                    const response = await request(process.env.BASE_URL)
+                    .put(`/booking/${bookingId}`)
+                    .set('Cookie', `token=${token}`)
+                    .set('Accept', 'application/json')
+                    .send(updatedBooking)
+                    
+                    expect(response.status).to.equal(400)
+                })
     })
 
     describe('Idempotency', ()=>{
