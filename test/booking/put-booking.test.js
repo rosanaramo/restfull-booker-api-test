@@ -63,7 +63,6 @@ describe('PUT/booking',()=>{
     });
 
     describe('Headers Validation', ()=> {
-        const updatedBooking = createBooking();
 
         it('Should return header application/json; charset=utf-8', async ()=>{
             const response = await request(process.env.BASE_URL)
@@ -80,23 +79,53 @@ describe('PUT/booking',()=>{
     
     describe ('Invalid Booking ID', ()=>{
 
-        it('Should return not found when trying to update a nonexistent booking', async ()=>{
+        it('Should return 405 when trying to update a nonexistent booking', async ()=>{
 
-            
             const response = await request(process.env.BASE_URL)
-            .put('/booking/1')
+            .put('/booking/897089098088')
             .set('Accept', 'application/json')
             .set('Cookie', `token=${token}`)
             .send(updatedBooking)
-            .expect(200)
+            .expect(405)
 
+            console.log(response.text)
+            expect(response.text).to.be.equal('Method Not Allowed')
+            
         });
     });
 
     describe('Invalid Data Types', () =>{
 
     });
-    describe('Special Characters', ()=>{
+    describe('Special Characters', async()=>{
+
+        it('Should allow to update bookings with special characters in string fields',async()=>{
+            
+             const updatedBooking = {
+                firstname : "teste",
+                lastname : "_&&&&مرح˜˜˜با",
+                totalprice : 0,
+                depositpaid : false,
+                    bookingdates : 
+                    {
+                        checkin : "%%",
+                        checkout : "%%"
+                    },
+                 additionalneeds : "くるま"
+            };
+
+            const response = await request(process.env.BASE_URL)
+            .put(`/booking/${bookingId}`)
+            .set('Accept','application/json')
+            .set('Cookie', `token=${token}`)
+            .send(updatedBooking)
+            .expect(200)
+
+            console.log(response.body)
+            console.log(updatedBooking)
+            expect(response.body).to.be.deep.equal(updatedBooking)
+
+        });
 
     });
 
