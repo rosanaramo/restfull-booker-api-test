@@ -94,14 +94,6 @@ describe('PUT/booking',()=>{
         });
     });
 
-    describe('Invalid Data Types', () =>{
-
-
-
-
-
-
-    });
     describe('Special Characters', ()=>{
 
          it('Should allow to update bookings with special characters in string fields',async()=>{
@@ -135,30 +127,29 @@ describe('PUT/booking',()=>{
     });
 
     describe('Security Tests', ()=> {
-
-
         it('Should reject HTML script',async ()=>{
                     //BUG: API accepts html scripts and returns 200 instead of return 400
-                    bookingBody.firstname = "<script>alert(1)</script>"
+                    updatedBooking.firstname = "<script>alert(1)</script>"
         
                     const response = await request(process.env.BASE_URL)
-                    .post('/booking')
+                    .put(`/booking/${bookingId}`)
+                    .set('Cookie',`token=${token}`)
                     .set('Accept', 'application/json')
-                    .send(bookingBody)
+                    .send(updatedBooking)
                     .expect(400)
                 });
         
                 it('Should reject sql injection', async ()=>{
                     // BUG: API accepts sql injection and returns 200 instead reject and return 400
-                    bookingBody.firstname = "'; DROP TABLE booking; --";
+                    updatedBooking.firstname = "'; DROP TABLE booking; --";
                     const response = await request(process.env.BASE_URL)
-                    .post('/booking')
+                    .put(`/booking/${bookingId}`)
+                    .set('Cookie', `token=${token}`)
                     .set('Accept', 'application/json')
-                    .send(bookingBody)
+                    .send(updatedBooking)
                     
                     expect(response.status).to.equal(400)
                 })
-
     })
 
     describe('Idempotency', ()=>{
