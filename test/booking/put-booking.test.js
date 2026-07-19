@@ -4,6 +4,7 @@ const {expect} = require('chai')
 const {faker} = require('@faker-js/faker')
 const {booking} = require('../../helpers/addBooking.js')
 const {getToken} = require('../../helpers/authentication.js')
+const {getBooking} = require('../../helpers/getBooking.js');
 
 
 
@@ -12,6 +13,7 @@ describe('PUT/booking',()=>{
     let bookingBody;
     let bookingId;
     let token;
+    let booking;
 
     beforeEach(async ()=>{
         ({bookingBody, bookingId} = await booking());
@@ -22,13 +24,13 @@ describe('PUT/booking',()=>{
            
         it('Should update a booking', async ()=>{
             
-            
             const response = await request(process.env.BASE_URL)
             .put(`/booking/${bookingId}`)
             .set('Accept', 'application/json')
             .set('Cookie', `token=${token}`)
             .send(bookingBody)
             .expect(200)
+
         });
 
     });
