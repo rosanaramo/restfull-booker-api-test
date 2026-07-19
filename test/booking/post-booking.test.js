@@ -14,7 +14,7 @@ describe('POST/booking', ()=> {
     describe('Happy Path', () => {
         it('Should return 200 when a booking is registered', async () => {
 
-            // const bookingBody= createBooking();
+            const bookingBody= createBooking();
 
               const response = await request(process.env.BASE_URL)
               .post('/booking')
