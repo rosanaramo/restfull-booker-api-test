@@ -15,5 +15,3 @@ function subDaysFromCurrentDate(days){
 module.exports= { addDaysToCurrentDate,
     subDaysFromCurrentDate
 }
-
-console.log(addDaysToCurrentDate(1))
