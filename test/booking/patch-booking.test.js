@@ -20,7 +20,7 @@ describe('Patch/booking',()=>{
     });
 
     describe('Authorization', ()=>
-        {
+    {
              it('Should return 403 when token is invalid',async ()=>{
             
                 const response = await request(process.env.BASE_URL)
@@ -31,7 +31,7 @@ describe('Patch/booking',()=>{
                 .expect(403)
 
                 expect(response.text).to.be.equal('Forbidden')
-        })
+            })
     })
 
     describe('Partial updating', ()=>
@@ -402,7 +402,7 @@ describe('Patch/booking',()=>{
 
         const response = await getBooking(bookingId);                
         expect(response.body).to.be.deep.equal(bookingBody)
-    });
+        });
 
     })
 
