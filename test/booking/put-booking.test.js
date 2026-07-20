@@ -186,7 +186,7 @@ describe('PUT/booking',()=>{
     });
 
     describe('Special Characters', ()=>{
-
+        //Bug: it allows to send checkin and checkout with special characteres and persist 0NaN-aN-aN 
          it('Should allow to update bookings with special characters in string fields',async()=>{
             
              const updatedBooking = {
