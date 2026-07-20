@@ -21,6 +21,21 @@ describe('Patch/booking/',()=>{
         bookingBody = createBooking();
     });
 
+    describe('Authorization', ()=>{
+        it('Should return 403 forbidden for invalid token',async ()=>{
+            
+                const response = await request(process.env.BASE_URL)
+                .patch(`/booking/${bookingId}`)
+                .set('Accept', 'application/json')
+                .set('Cookie', `token=9888invalid`)
+                .send(bookingBody)
+                .expect(403)
+
+                expect(response.text).to.be.equal('Forbidden')
+        })
+
+    })
+
     describe('Partial updating', ()=>{
      
         it('Should update only the first name of a booking', async ()=>{
@@ -152,15 +167,73 @@ describe('Patch/booking/',()=>{
     });
 
     describe('Invalid Data Types', ()=>
-        {
-
-                            
+    {
+     //BUG: API returns 200 server error instead of 400
+        it('Should return 400 when update the firstname with null value', async ()=>{
+           
+           const bookingBody ={
+                firstname: null
+            }
+            
+            const response = await request(process.env.BASE_URL)
+            .patch(`/booking/${bookingId}`)
+            .set('Accept', 'application/json')
+            .set('Cookie', `token=${token}`)
+            .send(bookingBody)
+            .expect(400)
+        
         });
+    
+        it('Should return 400 when updating checkin with null value', async ()=>{
+              //BUG: API returns 200 server error instead of 400
+            const bookingBody ={
+                checkin: null
+            }
+    
+            const response = await request
+            (process.env.BASE_URL)
+            .patch(`/booking/${bookingId}`)
+            .set('Accept', 'application/json')
+            .set('Cookie', `token=${token}`)
+            .send(bookingBody)
+            .expect(400)
+        });
+    
+        it('Should return 400 when updating checkout with null value',  async () =>{
+
+             const bookingBody ={
+                checkout: null
+            }
+            
+            const response = await request(process.env.BASE_URL)
+            .put(`/booking/${bookingId}`)
+            .set('Accept', 'application/json')
+            .set('Cookie', `token=${token}`)
+            .send(bookingBody)
+            .expect(400)
+    
+        })
+    
+        it('Should return 400 when update the depositpaid with a non-boolean value ', async () => {
+          
+            const bookingBody ={
+                depositpaid: null
+            }
+    
+            const response = await request(process.env.BASE_URL)
+            .put(`/booking/${bookingId}`)
+            .set('Accept', 'application/json')
+            .set('Cookie', `token=${token}`)
+            .send(bookingBody)
+            .expect(400)
+            });
+                            
+    });
 
     describe('Business Rules', ()=>
         {
 
-                 it('Should allow update a booking with total price equals 0',async ()=> {
+            it('Should allow update a booking with total price equals 0',async ()=> {
                         const bookingBody ={
                             totalprice:0
                         }
@@ -173,7 +246,7 @@ describe('Patch/booking/',()=>{
                         .expect(200)
         
                         const persistedBooking = await getBooking(bookingId);                
-                        expect(response.body.totalprice).to.be.deep.equal(persistedBooking.totalprice);
+                        expect(persistedBooking.body.totalprice).to.be.deep.equal(bookingBody.totalprice);
                     });
             
                     it('Should return 400 when updpating checkout before the checkin', async () =>{
@@ -201,9 +274,50 @@ describe('Patch/booking/',()=>{
 
     describe('Invalid Booking ID', ()=>{
 
+                it('Should return 405 when trying to update a nonexistent booking', async ()=>{
+        
+                    const response = await request(process.env.BASE_URL)
+                    .patch('/booking/897089098088')
+                    .set('Accept', 'application/json')
+                    .set('Cookie', `token=${token}`)
+                    .send(bookingBody)
+                    .expect(405)
+        
+                    expect(response.text).to.be.equal('Method Not Allowed')
+                    
+                });
+
     });
 
     describe('Special Characters', ()=>{
+
+
+        it('Should allow to update bookings with special characters in string fields',async()=>{
+                    //Bug: it allows to send checkin and checkout with special characteres and persist 0NaN-aN-aN 
+                     const updatedBooking = {
+                        firstname : "teste",
+                        lastname : "_&&&&مرح˜˜˜با",
+                        totalprice : 0,
+                        depositpaid : false,
+                            bookingdates : 
+                            {
+                                checkin : "%%",
+                                checkout : "%%"
+                            },
+                         additionalneeds : "くるま"
+                    };
+        
+                    const response = await request(process.env.BASE_URL)
+                    .patch(`/booking/${bookingId}`)
+                    .set('Accept','application/json')
+                    .set('Cookie', `token=${token}`)
+                    .send(updatedBooking)
+                    // .expect(200)
+        
+                     const persistedBooking = await getBooking(bookingId);                
+                     expect(persistedBooking.body).to.be.equal(updatedBooking)
+        
+                });
 
     });
 
