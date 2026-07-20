@@ -140,7 +140,7 @@ describe('PUT/booking',()=>{
             });
         })
 
-      describe('Business Rules', ()=> {
+    describe('Business Rules', ()=> {
     
              it('Should allow update a booking with total price equals 0',async ()=> {
                 updatedBooking.totalprice= 0
