@@ -5,6 +5,7 @@ const {booking} = require('../../helpers/addBooking.js')
 const {getToken} = require('../../helpers/authentication.js')
 const {getBooking} = require('../../helpers/getBooking.js');
 const {createBooking} = require('../../factories/bookingFactory.js')
+const{addDaysToCurrentDate,subDaysFromCurrentDate} = require('../../helpers/datesHelper.js')
 
 describe('Patch/booking/',()=>{
 
@@ -89,7 +90,13 @@ describe('Patch/booking/',()=>{
     describe('Invalid Data Types', ()=>
         {
 
-                it('Should allow update a booking with total price equals 0',async ()=> {
+                            
+        });
+
+    describe('Business Rules', ()=>
+        {
+
+                 it('Should allow update a booking with total price equals 0',async ()=> {
                         const bookingBody ={
                             totalprice:0
                         }
@@ -107,20 +114,24 @@ describe('Patch/booking/',()=>{
             
                     it('Should return 400 when updpating checkout before the checkin', async () =>{
                         // BUG: API allows registering a booking with checkout before the checkin
-                        updatedBooking.bookingdates.checkin = "2026-10-09";
-                        updatedBooking.bookingdates.checkout = "2026-10-08";
+                        
+                        let checkout =subDaysFromCurrentDate(0)
+                        let checkin= addDaysToCurrentDate(14);
+                        
+                        const bookingBody ={
+                            bookingdates:{
+                                   checkin:`${checkin}`,
+                                   checkout: `${checkout}` 
+                            }
+                        }
             
                         const response = await request (process.env.BASE_URL)
-                        .put(`/booking/${bookingId}`)
+                        .patch(`/booking/${bookingId}`)
                         .set('Accept', 'application/json')
                         .set('Cookie', `token=${token}`)
-                        .send(updatedBooking)
+                        .send(bookingBody)
                         .expect(400)
-                    });                    
-
-        });
-
-    describe('Business Rules', ()=>{
+                    });       
 
     });
 
