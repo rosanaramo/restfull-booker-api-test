@@ -166,8 +166,8 @@ describe('PUT/booking',()=>{
                     .expect(200)
                 }
 
-            const {response} = await getBooking(bookingId);                
-            expect(response).to.be.deep.equal(updatedBooking)
+            const response = await getBooking(bookingId);                
+            expect(response.body).to.be.deep.equal(updatedBooking)
         });
     });
 
