@@ -1,7 +1,6 @@
 require('dotenv').config()
 const request = require('supertest')
 const {expect} = require('chai')
-const {faker} = require('@faker-js/faker')
 const {booking} = require('../../helpers/addBooking.js')
 const {getToken} = require('../../helpers/authentication.js')
 const {getBooking} = require('../../helpers/getBooking.js');
@@ -11,13 +10,12 @@ const {createBooking} = require('../../factories/bookingFactory.js')
 
 describe('PUT/booking',()=>{
 
-    let bookingBody;
     let bookingId;
     let token;
     let updatedBooking;
 
     beforeEach(async ()=>{
-        ({bookingBody, bookingId} = await booking());
+        ({bookingId} = await booking());
          token = await getToken();
          updatedBooking = createBooking();
     })
@@ -64,6 +62,18 @@ describe('PUT/booking',()=>{
 
     describe('Headers Validation', ()=> {
 
+        it('Should not accept  application/html', async ()=>{
+             
+            const response = await request(process.env.BASE_URL)
+            .put(`/booking/${bookingId}`)
+            .set('Accept', 'application/html')
+            .set('Cookie', `token=${token}`)
+            .send(updatedBooking)
+                    
+            expect(response.status).to.equal(418);
+            expect(response.text).to.be.equal("I'm a Teapot");
+        });
+
         it('Should return header application/json; charset=utf-8', async ()=>{
             const response = await request(process.env.BASE_URL)
             .put(`/booking/${bookingId}`)
@@ -75,7 +85,89 @@ describe('PUT/booking',()=>{
             expect(response.headers['content-type']).to.be.equal('application/json; charset=utf-8');
 
         });
+
     });
+
+    describe('Invalid Data Types',() => {
+              //BUG: API returns 500 server error instead of 400
+        it('Should return 400 when update the firstname with null value', async ()=>{
+            updatedBooking.firstname = null;
+    
+            const response = await request(process.env.BASE_URL)
+            .put(`/booking/${bookingId}`)
+            .set('Accept', 'application/json')
+            .set('Cookie', `token=${token}`)
+            .send(updatedBooking)
+            .expect(400)
+        });
+    
+        it('Should return 400 when updating checkin with null value', async ()=>{
+              
+            updatedBooking.bookingdates.checkin = null
+    
+            const response = await request
+            (process.env.BASE_URL)
+            .put(`/booking/${bookingId}`)
+            .set('Accept', 'application/json')
+            .set('Cookie', `token=${token}`)
+            .send(updatedBooking)
+            .expect(400)
+        });
+    
+        it('Should return 400 when updating checkout with null value',  async () =>{
+        
+            updatedBooking.bookingdates.checkout = null
+    
+            const response = await request(process.env.BASE_URL)
+            .put(`/booking/${bookingId}`)
+            .set('Accept', 'application/json')
+            .set('Cookie', `token=${token}`)
+            .send(updatedBooking)
+            .expect(400)
+    
+        })
+    
+        it('Should return 400 when update the depositpaid with a non-boolean value ', async () => {
+                // BUG: API accepts boolean value as string
+            updatedBooking.depositpaid = 66
+    
+            const response = await request(process.env.BASE_URL)
+            .put(`/booking/${bookingId}`)
+            .set('Accept', 'application/json')
+            .set('Cookie', `token=${token}`)
+            .send(updatedBooking)
+            .expect(400)
+            });
+        })
+
+      describe('Business Rules', ()=> {
+    
+             it('Should allow update a booking with total price equals 0',async ()=> {
+                updatedBooking.totalprice= 0
+    
+                const response = await request(process.env.BASE_URL)
+                .put(`/booking/${bookingId}`)
+                .set('Accept', 'application/json')
+                .set('Cookie', `token=${token}`)
+                .send(updatedBooking)
+                .expect(200)
+
+                expect(response.body.totalprice).to.equal(0);
+            });
+    
+            it('Should return 400 when updpating checkout before the checkin', async () =>{
+                // BUG: API allows registering a booking with checkout before the checkin
+                updatedBooking.bookingdates.checkin = "2026-10-09";
+                updatedBooking.bookingdates.checkout = "2026-10-08";
+    
+                const response = await request (process.env.BASE_URL)
+                .put(`/booking/${bookingId}`)
+                .set('Accept', 'application/json')
+                .set('Cookie', `token=${token}`)
+                .send(updatedBooking)
+                .expect(400)
+            });
+        })
     
     describe ('Invalid Booking ID', ()=>{
 
@@ -88,7 +180,6 @@ describe('PUT/booking',()=>{
             .send(updatedBooking)
             .expect(405)
 
-            console.log(response.text)
             expect(response.text).to.be.equal('Method Not Allowed')
             
         });
@@ -118,12 +209,9 @@ describe('PUT/booking',()=>{
             .send(updatedBooking)
             .expect(200)
 
-            console.log(response.body)
-            console.log(updatedBooking)
             expect(response.body).to.be.deep.equal(updatedBooking)
 
         });
-
     });
 
     describe('Security Tests', ()=> {
@@ -155,10 +243,10 @@ describe('PUT/booking',()=>{
     describe('Idempotency', ()=>{
 
            it('Should be idempotent when updating a booking', async ()=>{
-            let requestResponse;
+            
                 for(let i =0; i<2; i++ ){
                     
-                    requestResponse = await request(process.env.BASE_URL)
+                    await request(process.env.BASE_URL)
                     .put(`/booking/${bookingId}`)
                     .set('Accept', 'application/json')
                     .set('Cookie', `token=${token}`)
@@ -172,7 +260,3 @@ describe('PUT/booking',()=>{
     });
 
 });
-
-
-
-// testar idempotencia
