@@ -11,6 +11,7 @@ describe('Patch/booking/',()=>{
     let bookingId;
     let bookingBody;
     let token;
+    let persistedBooking;
 
     beforeEach(async ()=>{
         
@@ -62,8 +63,7 @@ describe('Patch/booking/',()=>{
     });
 
     describe('Partially Updating',async ()=>
-    {
-
+        {
                 it('Should update only booking dates', async()=>{
                     const bookingBody = {
                     
@@ -73,7 +73,7 @@ describe('Patch/booking/',()=>{
                     }
                     
                 }
-                        await request(process.env.BASE_URL)
+                        const response = await request(process.env.BASE_URL)
                         .patch(`/booking/${bookingId}`)
                         .set('Accept', 'application/json')
                         .set('Cookie', `token=${token}`)
@@ -81,14 +81,44 @@ describe('Patch/booking/',()=>{
                         .expect(200)
                 
                         
-                    const response = await getBooking(bookingId);                
-                    expect(response.body.bookingdates).to.be.deep.equal(bookingBody.bookingdates)
+                    const persistedBooking = await getBooking(bookingId);                
+                    expect(persistedBooking.body.bookingdates).to.be.deep.equal(response.body.bookingdates)
                 })
     })
 
-    describe('Invalid Data Types', ()=>{
+    describe('Invalid Data Types', ()=>
+        {
 
-    });
+                it('Should allow update a booking with total price equals 0',async ()=> {
+                        const bookingBody ={
+                            totalprice:0
+                        }
+            
+                        const response = await request(process.env.BASE_URL)
+                        .patch(`/booking/${bookingId}`)
+                        .set('Accept', 'application/json')
+                        .set('Cookie', `token=${token}`)
+                        .send(bookingBody)
+                        .expect(200)
+        
+                        const persistedBooking = await getBooking(bookingId);                
+                        expect(response.totalprice).to.be.deep.equal(persistedBooking.totalprice);
+                    });
+            
+                    it('Should return 400 when updpating checkout before the checkin', async () =>{
+                        // BUG: API allows registering a booking with checkout before the checkin
+                        updatedBooking.bookingdates.checkin = "2026-10-09";
+                        updatedBooking.bookingdates.checkout = "2026-10-08";
+            
+                        const response = await request (process.env.BASE_URL)
+                        .put(`/booking/${bookingId}`)
+                        .set('Accept', 'application/json')
+                        .set('Cookie', `token=${token}`)
+                        .send(updatedBooking)
+                        .expect(400)
+                    });                    
+
+        });
 
     describe('Business Rules', ()=>{
 
@@ -105,7 +135,7 @@ describe('Patch/booking/',()=>{
     describe('Security Tests', ()=>{
 
     });
-    
+
     describe('Idempotency',()=>{
 
     })
