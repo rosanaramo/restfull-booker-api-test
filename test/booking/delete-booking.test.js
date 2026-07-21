@@ -18,7 +18,6 @@ describe('DELETE/booking', ()=>{
 
     describe('Authorization', () =>
     {
-
         it('Should return 403 when token is invalid',async ()=>{
                     
             const response = await request(process.env.BASE_URL)
@@ -30,6 +29,39 @@ describe('DELETE/booking', ()=>{
 
             expect(response.text).to.be.equal('Forbidden')
         })
+    });
 
-    })
+    describe('Happy Path', ()=>
+    {
+        it('Should delete a booking successfully', async()=>{
+
+                await request(process.env.BASE_URL)
+                .delete(`/booking/${bookingId}`)
+                .set('Accept', 'application/json')
+                .set('Cookie', `token=${token}`)
+                .expect(201)
+    
+                const persistedBooking = await getBooking(bookingId);                
+                expect(persistedBooking.status).to.be.equal(404)
+                expect(persistedBooking.text).to.be.equal('Not Found')
+
+            // Note:
+            // According to the current Restful Booker API behavior,
+            // DELETE returns HTTP 201 Created instead of the more common
+            // 200 OK or 204 No Content.
+        })
+    });
+
+    describe('Invalid Bookind ID', ()=>
+    {
+
+    });
+
+    describe('Security', ()=>{
+
+    });
+
+    describe('Idempotency', ()=>{
+
+    });
 })
