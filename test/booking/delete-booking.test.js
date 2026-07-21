@@ -60,7 +60,7 @@ let token;
 
     describe('Invalid Booking ID', ()=>
     {
-        it('Should return 405 when trying delete a booking with invalid id', async()=>{
+        it('Should return 405 when trying to delete a booking with invalid id', async()=>{
 
             const response = await request(process.env.BASE_URL)
             .delete(`/booking/87667899`)
@@ -71,7 +71,7 @@ let token;
             expect(response.text).to.be.equal('Method Not Allowed')
         })
 
-        it('Should return 405 when trying delete a booking with id equal 0', async()=>{
+        it('Should return 405 when trying to delete a booking with id equal to 0', async()=>{
 
             const response = await request(process.env.BASE_URL)
             .delete(`/booking/0`)

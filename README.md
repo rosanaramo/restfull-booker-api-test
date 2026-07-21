@@ -75,7 +75,7 @@ Clone the repository and install the dependencies:
 npm install
 ```
 
-Create a `.env` file in the project root:
+Create a `.env` file in the project root. You can use the available [env.example](./env.example) file as a reference for the required environment variables:
 
 ```env
 BASE_URL=https://restful-booker.herokuapp.com
